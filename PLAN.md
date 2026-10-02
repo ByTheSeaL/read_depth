@@ -394,7 +394,86 @@ android/app/src/main/java/com/readdepth/
 
 ---
 
-## 8. Build phases
+## 8. Builds, versions and releases (GitHub Actions)
+
+The app and the extension are built by GitHub Actions, never by hand. Every
+build gets its own version number, and past builds stay downloadable.
+
+### Version numbers
+
+```
+VERSION file:  0.1            ← major.minor, bumped by hand for milestones
+build number:  github.run_number   (increments on every workflow run)
+full version:  0.1.<build>     e.g. 0.1.37
+```
+
+- **Android:**
+  - `versionName = "0.1.37"`.
+  - `versionCode = 37`. It always increases, so each APK installs over the
+    previous one.
+- **Extension:** `manifest.json` `"version": "0.1.37"`, written in by the
+  workflow. The repo copy keeps `0.0.0`.
+- **Where you see it:**
+  - **Android:** the settings screen and the main screen's menu show
+    "Read Depth 0.1.37".
+  - **Extension:** the options page shows the same, and so does
+    `chrome://extensions`.
+
+So you can always tell which build you're running and match it to a release.
+
+### Workflow: `.github/workflows/build.yml`
+
+| Trigger | What it does |
+|---------|--------------|
+| Push to `main` | Builds both, then publishes a **GitHub Release** `v0.1.<build>` with `read-depth-0.1.<build>.apk` and `read-depth-extension-0.1.<build>.zip` attached, plus the commit list since the previous release as notes |
+| Push to any other branch / pull request | Builds both and uploads them as **workflow artifacts** (kept 90 days) so a branch can be tried before merging, without cluttering Releases |
+| Manual (`workflow_dispatch`) | Same as a push to `main` |
+
+- **Jobs:**
+  - `android`: JDK 17 and Gradle cache, then `./gradlew assembleRelease`.
+  - `extension`: runs `sync_prompt.sh`, stamps the version, and zips
+    `chrome-extension/`.
+  - `release`: runs after both, only on `main`.
+- **Past builds:** every release stays on the repo's **Releases** page, newest
+  first. Download any older APK or extension zip from there to roll back.
+
+### APK signing
+
+Android only lets an update install over the existing app if both are signed
+with the **same key**. So the workflow signs with one permanent release key,
+stored as GitHub repository secrets:
+
+| Secret | Contents |
+|--------|----------|
+| `ANDROID_KEYSTORE_BASE64` | the keystore file, base64-encoded |
+| `ANDROID_KEYSTORE_PASSWORD` | keystore password |
+| `ANDROID_KEY_ALIAS` | key alias |
+| `ANDROID_KEY_PASSWORD` | key password |
+
+- **Creating the key:** the repo will include `scripts/make_keystore.sh`,
+  which runs `keytool` and prints the base64 to paste into the secrets.
+  You run it once on your own machine, then keep the keystore file
+  somewhere safe. If it's lost, future builds can't update the installed
+  app; you'd have to uninstall and reinstall, which loses history.
+- **Missing secrets:** branch builds fall back to a debug-signed APK, so the
+  workflow still runs. Releases on `main` fail with a clear message instead,
+  so an unsigned release never gets published by accident.
+
+### Installing a build
+
+- **Android:**
+  - Download the APK from the release on your phone and open it.
+  - Allow "install unknown apps" for your browser the first time.
+  - Later builds install over the top and keep your history.
+- **Chrome:**
+  - Unzip into a fixed folder, e.g. `~/read-depth-extension/`, and use
+    **Load unpacked** at `chrome://extensions` once, in developer mode.
+  - For each new build, unzip over the same folder and press **Reload** on
+    the extension card.
+  - Settings and history survive this because they live in Chrome's storage,
+    not the folder.
+
+## 9. Build phases
 
 0. **Prompt and format.**
    - Write `shared/system-prompt.md` and the response-format spec.
@@ -406,13 +485,15 @@ android/app/src/main/java/com/readdepth/
      are reliable.
    - The script runs on your machine or the VPS. This build container can't
      reach openrouter.ai.
-1. **Chrome extension.**
+1. **Chrome extension + CI.**
+   - The `build.yml` workflow, the `VERSION` file and the signing script go
+     in first. Every later change then produces a numbered build.
    - Context menu, overlay, streaming, popup search, options.
    - Channels: auto, pinned, and correcting a misfile.
 2. **Android app.**
    - Share and select-text entry points, dialog, main screen search,
      settings, channels.
-   - First APK on GitHub Releases.
+   - First signed APK published by the workflow as a GitHub Release.
    - Both clients ship with the editable query box and follow-ups from the
      start.
 3. **Polish.**
@@ -420,7 +501,7 @@ android/app/src/main/java/com/readdepth/
    - History browsing, including reopening a lookup's thread.
    - Error states: no key, no credit, rate-limited, offline.
 
-## 9. Decisions so far
+## 10. Decisions so far
 
 - **Default model:** `z-ai/glm-5.3-flash`. Changeable from the dropdown.
 - **Answer length:** a setting, default 80 words.
@@ -428,3 +509,5 @@ android/app/src/main/java/com/readdepth/
   channel roster.
 - **Query box:** the selection sits at the top of every lookup screen and can
   be edited to re-explain.
+- **Builds:** GitHub Actions. Every push to `main` publishes a release
+  numbered `0.1.<build>`.
