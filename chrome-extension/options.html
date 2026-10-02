@@ -1,0 +1,89 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<title>Read Depth settings</title>
+	<link rel="stylesheet" href="pages.css" />
+	<style>
+		body { margin: 0 auto; max-width: 620px; padding: 28px 20px 60px; }
+		.check { align-items: center; display: flex; font-weight: normal; gap: 8px; }
+		.check input { width: auto; }
+		.two { display: grid; gap: 12px; grid-template-columns: 1fr 1fr; }
+		.channel { border-bottom: 1px solid var(--line); padding: 8px 0; }
+		.channel-head { align-items: center; display: flex; gap: 8px; }
+		.channel-name { flex: 1; font-weight: 600; }
+		.channel-lookups { margin: 8px 0 0 12px; }
+		.lookup-row { align-items: baseline; display: flex; font-size: 13px; gap: 8px; padding: 3px 0; }
+		.lookup-row .gist { color: var(--muted); flex: 1; }
+		.pinned-tag { border: 1px solid #b7791f; border-radius: 4px; color: #b7791f; font-size: 11px; padding: 0 5px; }
+		@media (max-width: 520px) { .two { grid-template-columns: 1fr; } }
+	</style>
+</head>
+<body>
+	<h1>Read Depth settings</h1>
+	<div class="muted" id="version"></div>
+
+	<label for="apiKey">OpenRouter API key</label>
+	<div class="row">
+		<input id="apiKey" type="password" placeholder="sk-or-v1-…" autocomplete="off" spellcheck="false" />
+		<button class="secondary" id="toggleKey" type="button">Show</button>
+		<button class="secondary" id="testKey" type="button">Test key</button>
+	</div>
+	<div class="status" id="keyStatus"></div>
+	<p class="hint">Create one at <a href="https://openrouter.ai/settings/keys" target="_blank">openrouter.ai/settings/keys</a>. It's stored in Chrome's synced settings and sent only to openrouter.ai.</p>
+
+	<label for="model">Model</label>
+	<div class="row">
+		<input id="model" type="text" list="models" spellcheck="false" />
+		<button class="secondary" id="refreshModels" type="button">Refresh list</button>
+	</div>
+	<datalist id="models"></datalist>
+	<div class="status" id="modelStatus"></div>
+
+	<div class="two">
+		<div>
+			<label for="targetWords">Answer length (words)</label>
+			<input id="targetWords" type="number" min="20" max="300" step="10" />
+		</div>
+		<div>
+			<label for="reasoningEffort">Reasoning effort</label>
+			<select id="reasoningEffort">
+				<option value="low">Low (fastest)</option>
+				<option value="medium">Medium</option>
+				<option value="high">High</option>
+				<option value="off">Off (only for models that allow it)</option>
+			</select>
+		</div>
+		<div>
+			<label for="rosterSize">Channels shown to the model</label>
+			<input id="rosterSize" type="number" min="1" max="50" />
+		</div>
+		<div>
+			<label for="historyLimit">Lookups kept in history</label>
+			<input id="historyLimit" type="number" min="50" max="5000" step="50" />
+		</div>
+	</div>
+
+	<label class="check"><input id="sendContext" type="checkbox" /> Send the surrounding sentence and page title with each lookup</label>
+
+	<label for="systemPrompt">System prompt</label>
+	<textarea id="systemPrompt" spellcheck="false"></textarea>
+	<div class="row">
+		<button class="secondary small" id="resetPrompt" type="button">Reset to default</button>
+		<span class="hint"><code>{{target_words}}</code> is replaced by the answer length.</span>
+	</div>
+
+	<div class="status" id="saveStatus"></div>
+
+	<p class="hint">Keyboard shortcut: <strong id="shortcut">Alt+Shift+D</strong>. Change it at <code>chrome://extensions/shortcuts</code>.</p>
+
+	<h2>Channels</h2>
+	<p class="hint">Rename a channel to an existing name to merge the two.</p>
+	<div id="channels"></div>
+	<div class="row">
+		<button class="danger small" id="clearHistory" type="button">Clear all history</button>
+	</div>
+
+	<script type="module" src="options.js"></script>
+</body>
+</html>
