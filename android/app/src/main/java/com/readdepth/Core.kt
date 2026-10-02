@@ -66,7 +66,8 @@ data class Lookup(
 	val gist        : String,
 	val model       : String,
 	val createdAt   : Long,
-	val thread      : MutableList<Turn> = mutableListOf()
+	val thread      : MutableList<Turn> = mutableListOf(),
+	var exportName  : String = ""     // Markdown history file name, fixed at first export
 )
 
 class Data(
@@ -434,6 +435,70 @@ object Core {
 			sourceUrl   = if (body == trimmed) "" else url.replace(Regex("#:~:text=.*$"), ""),
 			sourceTitle = subject?.trim() ?: ""
 		)
+	}
+
+	// ─── Markdown history ───────────────────────────────────────────────────
+
+	private fun yamlString(text: String) = "\"" + text
+		.replace("\\", "\\\\")
+		.replace("\"", "\\\"")
+		.replace("\n", "\\n")
+		.replace("\r", "\\r")
+		.replace("\t", "\\t") + "\""
+
+	private fun local(ts: Long, zone: ZoneId) = Instant.ofEpochMilli(ts).atZone(zone)
+
+	/*
+	 * The file name a lookup is saved under: date, time and the term, safe for
+	 * every filesystem and for Obsidian links. Fixed at first export and kept
+	 * on the lookup, so re-explaining it rewrites the same file.
+	 */
+	fun exportFileName(lookup: Lookup, zone: ZoneId = ZoneId.systemDefault()): String {
+		val t    = local(lookup.createdAt, zone)
+		val term = lookup.text
+			.replace(Regex("[\\\\/:*?\"<>|#^\\[\\]\\u0000-\\u001f]"), " ")
+			.replace(Regex("\\s+"), " ")
+			.trim()
+			.take(60)
+			.replace(Regex("[.\\s]+$"), "")
+			.ifEmpty { "lookup" }
+
+		return String.format(java.util.Locale.ROOT, "%04d-%02d-%02d %02d%02d %s.md", t.year, t.monthValue, t.dayOfMonth, t.hour, t.minute, term)
+	}
+
+	/* A lookup, its follow-ups and its channel as a Markdown note with YAML front matter. */
+	fun lookupMarkdown(lookup: Lookup, channelName: String, zone: ZoneId = ZoneId.systemDefault()): String {
+		val t   = local(lookup.createdAt, zone)
+		val out = mutableListOf(
+			"---",
+			"term: ${yamlString(lookup.text)}",
+			"channel: ${yamlString(channelName)}",
+			String.format(java.util.Locale.ROOT, "date: %04d-%02d-%02dT%02d:%02d", t.year, t.monthValue, t.dayOfMonth, t.hour, t.minute)
+		)
+
+		if (lookup.sourceTitle.isNotEmpty()) out += "source_title: ${yamlString(lookup.sourceTitle)}"
+		if (lookup.sourceUrl.isNotEmpty()) out += "source: ${yamlString(lookup.sourceUrl)}"
+
+		out += listOf("model: ${yamlString(lookup.model)}", "tags: [read-depth]", "---", "", "# ${oneLine(lookup.text, 200)}", "")
+
+		var where = "**Channel:** $channelName"
+
+		if (lookup.sourceUrl.isNotEmpty()) where += " · **Source:** [${oneLine(lookup.sourceTitle.ifEmpty { lookup.sourceUrl }, 200)}](${lookup.sourceUrl})"
+		else if (lookup.sourceTitle.isNotEmpty()) where += " · **Source:** ${oneLine(lookup.sourceTitle, 200)}"
+
+		out += where
+
+		if (lookup.context.isNotBlank()) out += listOf("", "> ${oneLine(lookup.context, 2000)}")
+
+		out += listOf("", lookup.explanation.trim())
+
+		if (lookup.thread.isNotEmpty()) {
+			out += listOf("", "## Follow-ups")
+
+			for (turn in lookup.thread) out += listOf("", "### ${oneLine(turn.q, 300)}", "", turn.a.trim())
+		}
+
+		return out.joinToString("\n") + "\n"
 	}
 
 	// ─── Rendering ──────────────────────────────────────────────────────────

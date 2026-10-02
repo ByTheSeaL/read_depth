@@ -25,6 +25,7 @@ class LookupEngine(context: Context) {
 		fun onLookupDone(lookup: Lookup, channelName: String)
 		fun onFollowUpDone(turn: Turn)
 		fun onError(op: Op, message: String, needsKey: Boolean)
+		fun onNotice(message: String)
 	}
 
 	private val app   = context.applicationContext
@@ -156,7 +157,8 @@ class LookupEngine(context: Context) {
 						explanation = explanation,
 						gist        = Core.gistOf(explanation),
 						model       = settings.model,
-						createdAt   = now
+						createdAt   = now,
+						exportName  = replaced?.exportName ?: ""
 					)
 
 					channel.lastUsedAt = now
@@ -168,6 +170,7 @@ class LookupEngine(context: Context) {
 
 				ui { onLookupDone(lookup, name) }
 				refreshState()
+				exportQuietly(listOf(lookup.id))
 			} catch (e: ApiException) {
 				if (!call.cancelled) ui { onError(Op.LOOKUP, e.message ?: "Something went wrong.", e.needsKey) }
 			} catch (e: IOException) {
@@ -211,11 +214,21 @@ class LookupEngine(context: Context) {
 				store.update { fresh -> Core.lookupById(fresh, lookupId)?.thread?.add(turn) }
 
 				ui { onFollowUpDone(turn) }
+				exportQuietly(listOf(lookupId))
 			} catch (e: ApiException) {
 				if (!call.cancelled) ui { onError(Op.FOLLOWUP, e.message ?: "Something went wrong.", e.needsKey) }
 			} catch (e: Exception) {
 				if (!call.cancelled) ui { onError(Op.FOLLOWUP, "Something went wrong: ${e.message}", false) }
 			}
+		}
+	}
+
+	/* A failed export never fails the lookup; it's reported on the panel instead. */
+	private fun exportQuietly(ids: List<String>) {
+		try {
+			Exporter.export(app, ids)
+		} catch (e: Exception) {
+			ui { onNotice("Couldn't write the Markdown note: ${e.message}") }
 		}
 	}
 
@@ -242,6 +255,8 @@ class LookupEngine(context: Context) {
 			}
 
 			refreshState()
+
+			if (clean.isNotEmpty() && lookupId != null) exportQuietly(listOf(lookupId))
 		}
 	}
 

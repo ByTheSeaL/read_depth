@@ -534,3 +534,26 @@ stored as GitHub repository secrets:
   be edited to re-explain.
 - **Builds:** GitHub Actions. Every push to `main` publishes a release
   numbered `0.1.<build>`.
+
+## 11. Markdown history (Android)
+
+Added after the first release:
+
+- **What it does:** every lookup becomes a Markdown note in a folder you choose
+  with the system folder picker. That folder can be anywhere the phone can
+  write, such as a synced Obsidian vault, and the app needs no storage
+  permission.
+- **Off by default:** with no folder set, nothing is written.
+- **File name:** `YYYY-MM-DD HHmm <term>.md`. It is fixed at the first export
+  and stored on the lookup, so later changes rewrite the same file.
+- **Contents:**
+  - YAML front matter: term, channel, date, source, model, `tags: [read-depth]`;
+  - the term as a heading, the channel and source, the surrounding text as a
+    quote, the explanation, and a *Follow-ups* section.
+- **When the note is rewritten:** on re-explain, follow-up, moving the lookup
+  to another channel, and renaming or merging its channel.
+- **Deleting:** deleting lookups or channels in the app leaves their notes
+  alone. They're your history.
+- **Chrome:** not supported. Extensions can only write inside the Downloads
+  folder, which doesn't suit an automatic history record.
+

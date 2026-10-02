@@ -113,10 +113,32 @@ class ChannelsActivity : AppCompatActivity() {
 			.setPositiveButton("Rename") { _, _ ->
 				val name = input.text.toString().trim()
 
-				if (name.isNotEmpty() && name != channel.name) update { Core.renameChannel(it, channel.id, name) }
+				if (name.isNotEmpty() && name != channel.name) renameAndExport(channel.id, name)
 			}
 			.setNegativeButton("Cancel", null)
 			.show()
+	}
+
+	// Saved notes carry the channel name, so rewrite the channel's notes.
+	private fun renameAndExport(id: String, name: String) {
+		thread {
+			val into = Store.get(this).update { data ->
+				Core.renameChannel(data, id, name)
+				(Core.channelById(data, id) ?: Core.findChannel(data, name))?.id
+			}
+
+			val error = try {
+				if (into != null) Exporter.exportChannel(this, into)
+				null
+			} catch (e: Exception) {
+				e.message
+			}
+
+			runOnUiThread {
+				load()
+				if (error != null) android.widget.Toast.makeText(this, "Couldn't update the Markdown notes: $error", android.widget.Toast.LENGTH_LONG).show()
+			}
+		}
 	}
 
 	private fun confirmDelete(channel: Core.ChannelSummary) {

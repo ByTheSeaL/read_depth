@@ -292,6 +292,8 @@ class LookupPanel(
 		follow.setText("")
 	}
 
+	override fun onNotice(message: String) = showStatus(message, isError = true)
+
 	override fun onError(op: LookupEngine.Op, message: String, needsKey: Boolean) {
 		setBusy(false)
 		showStatus(message, isError = true)

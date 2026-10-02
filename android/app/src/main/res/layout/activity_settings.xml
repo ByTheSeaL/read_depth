@@ -93,6 +93,40 @@
 		<TextView style="@style/SettingsLabel" android:text="Lookups kept in history" />
 		<EditText android:id="@+id/history_limit" style="@style/SettingsNumber" />
 
+		<TextView style="@style/SettingsLabel" android:text="Markdown history folder" />
+		<TextView android:id="@+id/export_folder" style="@style/SettingsHint" />
+
+		<LinearLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:orientation="horizontal">
+
+			<Button
+				android:id="@+id/choose_folder"
+				style="@style/Widget.AppCompat.Button.Borderless.Colored"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="Choose folder" />
+
+			<Button
+				android:id="@+id/export_all"
+				style="@style/Widget.AppCompat.Button.Borderless.Colored"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="Export all now" />
+
+			<Button
+				android:id="@+id/export_off"
+				style="@style/Widget.AppCompat.Button.Borderless.Colored"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="Turn off" />
+		</LinearLayout>
+
+		<TextView
+			style="@style/SettingsHint"
+			android:text="When a folder is set, every lookup is saved there as a Markdown note (term, channel, explanation and follow-ups) and updated as it changes. A folder inside an Obsidian vault works well." />
+
 		<TextView style="@style/SettingsLabel" android:text="System prompt" />
 		<EditText
 			android:id="@+id/system_prompt"

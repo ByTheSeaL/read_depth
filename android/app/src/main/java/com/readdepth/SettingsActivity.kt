@@ -1,5 +1,7 @@
 package com.readdepth
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.text.InputType
 import android.widget.ArrayAdapter
@@ -8,6 +10,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Spinner
 import android.widget.TextView
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import java.util.Locale
@@ -25,7 +28,13 @@ class SettingsActivity : AppCompatActivity() {
 	private lateinit var historyLimit : EditText
 	private lateinit var systemPrompt : EditText
 
+	private lateinit var exportFolder : TextView
+
 	private var models: List<OpenRouter.Model> = emptyList()
+
+	private val pickFolder = registerForActivityResult(ActivityResultContracts.OpenDocumentTree()) { uri ->
+		if (uri != null) setFolder(uri)
+	}
 	private lateinit var defaultPrompt: String
 
 	override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,6 +52,7 @@ class SettingsActivity : AppCompatActivity() {
 		rosterSize   = findViewById(R.id.roster_size)
 		historyLimit = findViewById(R.id.history_limit)
 		systemPrompt = findViewById(R.id.system_prompt)
+		exportFolder = findViewById(R.id.export_folder)
 
 		defaultPrompt = Prefs.defaultSystemPrompt(this)
 
@@ -73,6 +83,11 @@ class SettingsActivity : AppCompatActivity() {
 		findViewById<Button>(R.id.test_key).setOnClickListener { testKey() }
 		findViewById<Button>(R.id.refresh_models).setOnClickListener { loadModels(force = true) }
 		findViewById<Button>(R.id.reset_prompt).setOnClickListener { systemPrompt.setText(defaultPrompt) }
+
+		findViewById<Button>(R.id.choose_folder).setOnClickListener { pickFolder.launch(null) }
+		findViewById<Button>(R.id.export_off).setOnClickListener { setFolder(null) }
+		findViewById<Button>(R.id.export_all).setOnClickListener { exportAll() }
+		showFolder()
 
 		model.setOnItemClickListener { _, _, _, _ -> describeModel() }
 		model.setOnFocusChangeListener { _, focused -> if (!focused) describeModel() }
@@ -105,6 +120,59 @@ class SettingsActivity : AppCompatActivity() {
 			rosterSize      = Core.clamp(rosterSize.text.toString().toIntOrNull() ?: defaults.rosterSize, 1, 50),
 			historyLimit    = Core.clamp(historyLimit.text.toString().toIntOrNull() ?: defaults.historyLimit, 50, 5000)
 		))
+	}
+
+	private fun setFolder(uri: Uri?) {
+		val flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+
+		// Give back access to the old folder; keep access to the new one across restarts.
+		Prefs.exportFolder(this)?.let {
+			try {
+				contentResolver.releasePersistableUriPermission(Uri.parse(it), flags)
+			} catch (e: SecurityException) {
+				// Already gone.
+			}
+		}
+
+		if (uri != null) contentResolver.takePersistableUriPermission(uri, flags)
+
+		Prefs.setExportFolder(this, uri?.toString())
+		showFolder()
+	}
+
+	private fun showFolder() {
+		thread {
+			val name = Exporter.folderName(this)
+			val on   = Prefs.exportFolder(this) != null
+
+			runOnUiThread {
+				when {
+					!on -> setStatus(exportFolder, "Off")
+					name == null -> setStatus(exportFolder, "The folder isn't available any more. Choose it again.", isError = true)
+					else -> setStatus(exportFolder, "Saving to: $name")
+				}
+			}
+		}
+	}
+
+	private fun exportAll() {
+		if (Prefs.exportFolder(this) == null) {
+			setStatus(exportFolder, "Choose a folder first.", isError = true)
+			return
+		}
+
+		setStatus(exportFolder, "Exporting…")
+
+		thread {
+			try {
+				val count = Exporter.exportAll(this)
+				val name  = Exporter.folderName(this)
+
+				runOnUiThread { setStatus(exportFolder, "Saved $count note${if (count == 1) "" else "s"} to $name.") }
+			} catch (e: Exception) {
+				runOnUiThread { setStatus(exportFolder, "Export failed: ${e.message}", isError = true) }
+			}
+		}
 	}
 
 	private fun setStatus(view: TextView, text: String, isError: Boolean = false) {
