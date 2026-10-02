@@ -34,6 +34,14 @@ object Prefs {
 			.apply()
 	}
 
+	/* The Markdown history folder (a Storage Access Framework tree URI), or null when off. */
+	fun exportFolder(context: Context): String? =
+		context.getSharedPreferences(NAME, Context.MODE_PRIVATE).getString("exportFolder", null)
+
+	fun setExportFolder(context: Context, uri: String?) {
+		context.getSharedPreferences(NAME, Context.MODE_PRIVATE).edit().putString("exportFolder", uri).apply()
+	}
+
 	fun defaultSystemPrompt(context: Context): String =
 		context.resources.openRawResource(R.raw.system_prompt).bufferedReader().use { it.readText() }
 

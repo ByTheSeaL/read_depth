@@ -171,4 +171,17 @@ class CoreTest {
 		assertEquals("https://example.com/a", link.text)
 		assertFalse(link.sourceUrl.isNotEmpty())
 	}
+
+	@Test
+	fun markdownHistory() {
+		for (case in cases.getJSONArray("export").objects()) {
+			val l      = case.getJSONObject("lookup")
+			val thread = l.getJSONArray("thread").objects().map { Turn(it.getString("q"), it.getString("a"), 0) }
+			val lookup = Lookup("x", l.getString("text"), l.getString("context"), l.getString("sourceUrl"), l.getString("sourceTitle"),
+				"c", "", l.getString("explanation"), "", l.getString("model"), l.getLong("createdAt"), thread.toMutableList())
+
+			assertEquals(case.getString("name"), case.getString("fileName"), Core.exportFileName(lookup, utc))
+			assertEquals(case.getString("name"), case.getString("markdown"), Core.lookupMarkdown(lookup, case.getString("channel"), utc))
+		}
+	}
 }

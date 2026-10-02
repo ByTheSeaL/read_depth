@@ -67,6 +67,7 @@ class Store private constructor(private val file: File) {
 				.put("gist", l.gist)
 				.put("model", l.model)
 				.put("createdAt", l.createdAt)
+				.put("exportName", l.exportName)
 				.put("thread", JSONArray(l.thread.map { t ->
 					JSONObject().put("q", t.q).put("a", t.a).put("createdAt", t.createdAt)
 				}))
@@ -109,7 +110,8 @@ class Store private constructor(private val file: File) {
 					thread      = (0 until thread.length()).map { j ->
 						val t = thread.getJSONObject(j)
 						Turn(t.optString("q"), t.optString("a"), t.optLong("createdAt"))
-					}.toMutableList()
+					}.toMutableList(),
+					exportName  = l.optString("exportName")
 				)
 			}.toMutableList(),
 			pinnedChannelId = if (json.isNull("pinnedChannelId")) null else json.optString("pinnedChannelId")

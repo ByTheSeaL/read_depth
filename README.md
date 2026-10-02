@@ -17,6 +17,14 @@ what you've already looked up there, even days later. The channel box shows
 which channel a lookup went into. Type a name there to pin a channel or to move
 a lookup to another one.
 
+**Markdown history (Android only):** choose a folder in Settings → *Markdown
+history folder*, e.g. one inside an Obsidian vault, and every lookup is saved
+there as a Markdown note: the term, its channel, the explanation and any
+follow-ups, with YAML front matter. The note is updated when the lookup is
+re-explained, followed up, moved to another channel, or its channel is
+renamed. **Export all now** writes notes for the lookups made before you set
+the folder. With no folder set, nothing is written.
+
 There is no server: both clients talk to OpenRouter directly. Settings, history
 and channels are kept separately on each device.
 

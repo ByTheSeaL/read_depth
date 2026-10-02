@@ -1,31 +1,111 @@
 {
-	"_comment": "Run by both clients' unit tests (chrome-extension/test, android/app/src/test) so the two parse replies and build prompts identically. Times are UTC.",
-
+	"_comment": "Run by both clients' unit tests (chrome-extension/test, android/app/src/test) so the two parse replies and build prompts identically. The export cases are Android-only (Markdown history). Times are UTC.",
 	"parse": [
-		{ "name": "channel line then text", "chunks": ["CHANNEL: Python\n\n`wraps` copies", " metadata."], "channel": "Python", "text": "`wraps` copies metadata." },
-		{ "name": "channel split across chunks", "chunks": ["CHAN", "NEL: Car", "diology\nA stent is a tube."], "channel": "Cardiology", "text": "A stent is a tube." },
-		{ "name": "bold channel line", "chunks": ["**Channel:** Kantian Philosophy\nThe *a priori* is…"], "channel": "Kantian Philosophy", "text": "The *a priori* is…" },
-		{ "name": "quoted name with trailing period", "chunks": ["CHANNEL: \"Kubernetes\".\nA pod is…"], "channel": "Kubernetes", "text": "A pod is…" },
-		{ "name": "no channel line", "chunks": ["A monad is a design pattern.", " More text."], "channel": null, "text": "A monad is a design pattern. More text." },
-		{ "name": "leading whitespace", "chunks": ["\n\n  CHANNEL: Rust\nOwnership means…"], "channel": "Rust", "text": "Ownership means…" },
-		{ "name": "channel only, stream ends", "chunks": ["CHANNEL: Python"], "channel": "Python", "text": "" }
+		{
+			"name": "channel line then text",
+			"chunks": [
+				"CHANNEL: Python\n\n`wraps` copies",
+				" metadata."
+			],
+			"channel": "Python",
+			"text": "`wraps` copies metadata."
+		},
+		{
+			"name": "channel split across chunks",
+			"chunks": [
+				"CHAN",
+				"NEL: Car",
+				"diology\nA stent is a tube."
+			],
+			"channel": "Cardiology",
+			"text": "A stent is a tube."
+		},
+		{
+			"name": "bold channel line",
+			"chunks": [
+				"**Channel:** Kantian Philosophy\nThe *a priori* is…"
+			],
+			"channel": "Kantian Philosophy",
+			"text": "The *a priori* is…"
+		},
+		{
+			"name": "quoted name with trailing period",
+			"chunks": [
+				"CHANNEL: \"Kubernetes\".\nA pod is…"
+			],
+			"channel": "Kubernetes",
+			"text": "A pod is…"
+		},
+		{
+			"name": "no channel line",
+			"chunks": [
+				"A monad is a design pattern.",
+				" More text."
+			],
+			"channel": null,
+			"text": "A monad is a design pattern. More text."
+		},
+		{
+			"name": "leading whitespace",
+			"chunks": [
+				"\n\n  CHANNEL: Rust\nOwnership means…"
+			],
+			"channel": "Rust",
+			"text": "Ownership means…"
+		},
+		{
+			"name": "channel only, stream ends",
+			"chunks": [
+				"CHANNEL: Python"
+			],
+			"channel": "Python",
+			"text": ""
+		}
 	],
-
 	"gist": [
-		{ "input": "`functools.wraps` is a decorator that copies metadata. It keeps names intact.", "gist": "functools.wraps is a decorator that copies metadata." },
-		{ "input": "**Ischemia** is reduced blood flow, e.g. from a blocked artery. It starves tissue.", "gist": "Ischemia is reduced blood flow, e.g. from a blocked artery." },
-		{ "input": "A list:\n- one\n- two", "gist": "A list: one two" },
-		{ "input": "`__wrapped__` is an attribute set by `functools.wraps`. It points back.", "gist": "__wrapped__ is an attribute set by functools.wraps." },
-		{ "input": "Kant's *Ding an sich* is the thing as it is in itself, apart from how we perceive it", "gist": "Kant's Ding an sich is the thing as it is in itself, apart from how we perceive it" }
+		{
+			"input": "`functools.wraps` is a decorator that copies metadata. It keeps names intact.",
+			"gist": "functools.wraps is a decorator that copies metadata."
+		},
+		{
+			"input": "**Ischemia** is reduced blood flow, e.g. from a blocked artery. It starves tissue.",
+			"gist": "Ischemia is reduced blood flow, e.g. from a blocked artery."
+		},
+		{
+			"input": "A list:\n- one\n- two",
+			"gist": "A list: one two"
+		},
+		{
+			"input": "`__wrapped__` is an attribute set by `functools.wraps`. It points back.",
+			"gist": "__wrapped__ is an attribute set by functools.wraps."
+		},
+		{
+			"input": "Kant's *Ding an sich* is the thing as it is in itself, apart from how we perceive it",
+			"gist": "Kant's Ding an sich is the thing as it is in itself, apart from how we perceive it"
+		}
 	],
-
 	"refinement": [
-		{ "original": "wraps", "updated": "functools.wraps in tests", "expected": true },
-		{ "original": "wraps", "updated": "Wraps", "expected": false },
-		{ "original": "functools.wraps", "updated": "wraps", "expected": false },
-		{ "original": "stent", "updated": "monad", "expected": false }
+		{
+			"original": "wraps",
+			"updated": "functools.wraps in tests",
+			"expected": true
+		},
+		{
+			"original": "wraps",
+			"updated": "Wraps",
+			"expected": false
+		},
+		{
+			"original": "functools.wraps",
+			"updated": "wraps",
+			"expected": false
+		},
+		{
+			"original": "stent",
+			"updated": "monad",
+			"expected": false
+		}
 	],
-
 	"lookupMessage": [
 		{
 			"name": "auto with roster, same source",
@@ -34,16 +114,47 @@
 			"forcedChannel": null,
 			"data": {
 				"channels": [
-					{ "id": "c1", "name": "Python", "createdAt": 1759334400000, "lastUsedAt": 1759420500000 },
-					{ "id": "c2", "name": "Cardiology", "createdAt": 1759161600000, "lastUsedAt": 1759248000000 }
+					{
+						"id": "c1",
+						"name": "Python",
+						"createdAt": 1759334400000,
+						"lastUsedAt": 1759420500000
+					},
+					{
+						"id": "c2",
+						"name": "Cardiology",
+						"createdAt": 1759161600000,
+						"lastUsedAt": 1759248000000
+					}
 				],
 				"lookups": [
-					{ "id": "l1", "text": "stent", "gist": "A stent is a small mesh tube that holds an artery open.", "channelId": "c2", "sourceUrl": "https://journal.example/a", "sourceTitle": "Heart", "createdAt": 1759248000000 },
-					{ "id": "l2", "text": "decorator", "gist": "A decorator wraps a function to add behaviour.", "channelId": "c1", "sourceUrl": "https://docs.python.org/3/glossary.html#term-decorator", "sourceTitle": "Glossary", "createdAt": 1759420500000 }
+					{
+						"id": "l1",
+						"text": "stent",
+						"gist": "A stent is a small mesh tube that holds an artery open.",
+						"channelId": "c2",
+						"sourceUrl": "https://journal.example/a",
+						"sourceTitle": "Heart",
+						"createdAt": 1759248000000
+					},
+					{
+						"id": "l2",
+						"text": "decorator",
+						"gist": "A decorator wraps a function to add behaviour.",
+						"channelId": "c1",
+						"sourceUrl": "https://docs.python.org/3/glossary.html#term-decorator",
+						"sourceTitle": "Glossary",
+						"createdAt": 1759420500000
+					}
 				],
 				"pinnedChannelId": null
 			},
-			"query": { "text": "functools.wraps", "context": "Use functools.wraps when writing a decorator.", "sourceUrl": "https://docs.python.org/3/glossary.html", "sourceTitle": "Glossary" },
+			"query": {
+				"text": "functools.wraps",
+				"context": "Use functools.wraps when writing a decorator.",
+				"sourceUrl": "https://docs.python.org/3/glossary.html",
+				"sourceTitle": "Glossary"
+			},
 			"expected": "## Channels\n\nChoose the channel for this lookup.\nPrevious lookup: channel \"Python\", 5 minutes ago, from the same source as this one.\n\n### Python (last used today)\n- decorator: A decorator wraps a function to add behaviour.\n\n### Cardiology (last used 2 days ago)\n- stent: A stent is a small mesh tube that holds an artery open.\n\n## Source\nTitle: Glossary\nURL: https://docs.python.org/3/glossary.html\n\n## Surrounding text\nUse functools.wraps when writing a decorator.\n\n## Look up\nfunctools.wraps"
 		},
 		{
@@ -51,8 +162,17 @@
 			"now": 1759420800000,
 			"rosterSize": 12,
 			"forcedChannel": "Rust",
-			"data": { "channels": [], "lookups": [], "pinnedChannelId": null },
-			"query": { "text": "borrow checker", "context": "", "sourceUrl": "", "sourceTitle": "" },
+			"data": {
+				"channels": [],
+				"lookups": [],
+				"pinnedChannelId": null
+			},
+			"query": {
+				"text": "borrow checker",
+				"context": "",
+				"sourceUrl": "",
+				"sourceTitle": ""
+			},
 			"expected": "## Channels\n\nThe reader has pinned the channel \"Rust\". Use exactly that name.\n\n### Rust\n(nothing looked up here yet)\n\n## Look up\nborrow checker"
 		},
 		{
@@ -60,9 +180,57 @@
 			"now": 1759420800000,
 			"rosterSize": 12,
 			"forcedChannel": null,
-			"data": { "channels": [], "lookups": [], "pinnedChannelId": null },
-			"query": { "text": "epistemology", "context": "", "sourceUrl": "", "sourceTitle": "" },
+			"data": {
+				"channels": [],
+				"lookups": [],
+				"pinnedChannelId": null
+			},
+			"query": {
+				"text": "epistemology",
+				"context": "",
+				"sourceUrl": "",
+				"sourceTitle": ""
+			},
 			"expected": "## Channels\n\nChoose the channel for this lookup.\nThe reader has no channels yet.\n\n## Look up\nepistemology"
+		}
+	],
+	"export": [
+		{
+			"name": "full lookup with source, context and follow-ups",
+			"channel": "Python",
+			"lookup": {
+				"text": "functools.wraps",
+				"createdAt": 1790975640000,
+				"sourceTitle": "functools — docs",
+				"sourceUrl": "https://docs.python.org/3/library/functools.html",
+				"context": "Use it when\nwriting a \"decorator\".",
+				"model": "z-ai/glm-5.3-flash",
+				"explanation": "`wraps` copies metadata.\n\n```py\nx = 1\n```\n",
+				"thread": [
+					{
+						"q": "Methods too?",
+						"a": "Yes, the same way.\n"
+					}
+				]
+			},
+			"fileName": "2026-10-02 2114 functools.wraps.md",
+			"markdown": "---\nterm: \"functools.wraps\"\nchannel: \"Python\"\ndate: 2026-10-02T21:14\nsource_title: \"functools — docs\"\nsource: \"https://docs.python.org/3/library/functools.html\"\nmodel: \"z-ai/glm-5.3-flash\"\ntags: [read-depth]\n---\n\n# functools.wraps\n\n**Channel:** Python · **Source:** [functools — docs](https://docs.python.org/3/library/functools.html)\n\n> Use it when writing a \"decorator\".\n\n`wraps` copies metadata.\n\n```py\nx = 1\n```\n\n## Follow-ups\n\n### Methods too?\n\nYes, the same way.\n"
+		},
+		{
+			"name": "typed lookup, awkward characters",
+			"channel": "Kantian \"Philosophy\"",
+			"lookup": {
+				"text": "Thoughts without content are empty: a/b? [x] #tag",
+				"createdAt": 0,
+				"sourceTitle": "",
+				"sourceUrl": "",
+				"context": "",
+				"model": "m",
+				"explanation": "A paraphrase.",
+				"thread": []
+			},
+			"fileName": "1970-01-01 0000 Thoughts without content are empty a b x tag.md",
+			"markdown": "---\nterm: \"Thoughts without content are empty: a/b? [x] #tag\"\nchannel: \"Kantian \\\"Philosophy\\\"\"\ndate: 1970-01-01T00:00\nmodel: \"m\"\ntags: [read-depth]\n---\n\n# Thoughts without content are empty: a/b? [x] #tag\n\n**Channel:** Kantian \"Philosophy\"\n\nA paraphrase.\n"
 		}
 	]
 }
