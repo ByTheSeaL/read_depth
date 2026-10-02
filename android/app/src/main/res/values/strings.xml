@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="app_name">Read Depth</string>
+	<!-- Shown in the share sheet and in the text-selection menu. -->
+	<string name="explain_label">Read Depth</string>
+	<string name="query_hint">A word, phrase or sentence…</string>
+	<string name="explain">Explain</string>
+	<string name="channel">CHANNEL</string>
+	<string name="channel_hint">auto: picked for you</string>
+	<string name="auto">auto</string>
+	<string name="pinned">📌 pinned</string>
+	<string name="follow_hint">Ask a follow-up…</string>
+	<string name="ask">Ask</string>
+	<string name="copy">Copy</string>
+	<string name="copied">Copied</string>
+	<string name="open_settings">Open settings</string>
+	<string name="thinking">Thinking…</string>
+	<string name="recent">RECENT LOOKUPS</string>
+	<string name="settings">Settings</string>
+	<string name="channels">Channels</string>
+	<string name="clear_history">Clear all history</string>
+</resources>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A thin rule down the left of each follow-up, like the extension's. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+	<item android:width="3dp" android:gravity="start|fill_vertical">
+		<shape android:shape="rectangle"><solid android:color="#40808090" /></shape>
+	</item>
+</layer-list>

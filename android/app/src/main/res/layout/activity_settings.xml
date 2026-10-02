@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent">
+
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:orientation="vertical"
+		android:padding="16dp">
+
+		<TextView
+			android:id="@+id/version"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:alpha="0.6"
+			android:textSize="12sp" />
+
+		<TextView style="@style/SettingsLabel" android:text="OpenRouter API key" />
+
+		<LinearLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:gravity="center_vertical"
+			android:orientation="horizontal">
+
+			<EditText
+				android:id="@+id/api_key"
+				android:layout_width="0dp"
+				android:layout_height="wrap_content"
+				android:layout_weight="1"
+				android:background="@drawable/field"
+				android:hint="sk-or-v1-…"
+				android:importantForAutofill="no"
+				android:inputType="textPassword"
+				android:padding="10dp" />
+
+			<Button
+				android:id="@+id/toggle_key"
+				style="@style/Widget.AppCompat.Button.Borderless.Colored"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:minWidth="0dp"
+				android:text="Show" />
+
+			<Button
+				android:id="@+id/test_key"
+				style="@style/Widget.AppCompat.Button.Borderless.Colored"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:minWidth="0dp"
+				android:text="Test" />
+		</LinearLayout>
+
+		<TextView android:id="@+id/key_status" style="@style/SettingsHint" />
+		<TextView style="@style/SettingsHint" android:text="Create one at openrouter.ai/settings/keys. It stays on this phone and is sent only to openrouter.ai." />
+
+		<TextView style="@style/SettingsLabel" android:text="Model" />
+
+		<AutoCompleteTextView
+			android:id="@+id/model"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:background="@drawable/field"
+			android:completionThreshold="1"
+			android:importantForAutofill="no"
+			android:inputType="textNoSuggestions|textUri"
+			android:maxLines="1"
+			android:padding="10dp" />
+
+		<TextView android:id="@+id/model_status" style="@style/SettingsHint" />
+
+		<Button
+			android:id="@+id/refresh_models"
+			style="@style/Widget.AppCompat.Button.Borderless.Colored"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="Refresh model list" />
+
+		<TextView style="@style/SettingsLabel" android:text="Answer length (words)" />
+		<EditText android:id="@+id/target_words" style="@style/SettingsNumber" />
+
+		<TextView style="@style/SettingsLabel" android:text="Reasoning effort" />
+		<Spinner
+			android:id="@+id/reasoning"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content" />
+		<TextView style="@style/SettingsHint" android:text="The default model always reasons; low is fastest. Off only works for models that allow it." />
+
+		<TextView style="@style/SettingsLabel" android:text="Channels shown to the model" />
+		<EditText android:id="@+id/roster_size" style="@style/SettingsNumber" />
+
+		<TextView style="@style/SettingsLabel" android:text="Lookups kept in history" />
+		<EditText android:id="@+id/history_limit" style="@style/SettingsNumber" />
+
+		<TextView style="@style/SettingsLabel" android:text="System prompt" />
+		<EditText
+			android:id="@+id/system_prompt"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:background="@drawable/field"
+			android:fontFamily="monospace"
+			android:gravity="top"
+			android:importantForAutofill="no"
+			android:inputType="textMultiLine|textNoSuggestions"
+			android:minLines="8"
+			android:padding="10dp"
+			android:textSize="12sp" />
+		<TextView style="@style/SettingsHint" android:text="{{target_words}} is replaced by the answer length." />
+
+		<Button
+			android:id="@+id/reset_prompt"
+			style="@style/Widget.AppCompat.Button.Borderless.Colored"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="Reset prompt to default" />
+
+		<TextView
+			style="@style/SettingsHint"
+			android:layout_marginTop="16dp"
+			android:text="Settings save when you leave this screen." />
+	</LinearLayout>
+</ScrollView>

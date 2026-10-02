@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<style name="SettingsLabel">
+		<item name="android:layout_width">match_parent</item>
+		<item name="android:layout_height">wrap_content</item>
+		<item name="android:layout_marginTop">18dp</item>
+		<item name="android:layout_marginBottom">6dp</item>
+		<item name="android:textStyle">bold</item>
+	</style>
+
+	<style name="SettingsHint">
+		<item name="android:layout_width">match_parent</item>
+		<item name="android:layout_height">wrap_content</item>
+		<item name="android:layout_marginTop">4dp</item>
+		<item name="android:alpha">0.65</item>
+		<item name="android:textSize">12sp</item>
+	</style>
+
+	<style name="SettingsNumber">
+		<item name="android:layout_width">match_parent</item>
+		<item name="android:layout_height">wrap_content</item>
+		<item name="android:background">@drawable/field</item>
+		<item name="android:importantForAutofill">no</item>
+		<item name="android:inputType">number</item>
+		<item name="android:padding">10dp</item>
+	</style>
+</resources>
