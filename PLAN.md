@@ -257,8 +257,23 @@ Variables filled in per request:
 - the surrounding context;
 - the selection.
 
-`max_tokens` is set to about 3× the target word count, so a runaway answer
-gets cut off.
+`max_tokens` is set to about 3× the target word count, plus a reasoning
+allowance (below), so a runaway answer gets cut off.
+
+**Reasoning models.** The default model, `z-ai/glm-5.3-flash`, always
+reasons before answering; OpenRouter rejects `reasoning: {enabled: false}`
+for it. A tight `max_tokens` can be used up by hidden reasoning, leaving an
+empty reply. A test with `max_tokens: 200` returned nothing.
+
+- **Every request sends `reasoning: {effort: "low"}`.** In testing that
+  cost about 60 reasoning tokens and gave a ~2 s answer that followed the
+  `CHANNEL:` format.
+- **`max_tokens` includes a 1,000-token reasoning allowance.**
+- **Settings has a *Reasoning effort* option:** low (default), medium, high,
+  or off for models that allow it.
+- **If a reply finishes with no visible text**, the client shows
+  "The model used its whole allowance thinking — try again or raise the
+  answer length". It never shows a blank answer.
 
 ---
 
@@ -355,6 +370,7 @@ android/app/src/main/java/com/readdepth/
 | OpenRouter API key | — (required) |
 | Model | `z-ai/glm-5.3-flash` |
 | Answer length | 80 words (target; adjustable 20–300) |
+| Reasoning effort | low (the default model can't turn reasoning off) |
 | System prompt | the shared default, with a reset button |
 | Send surrounding context | on (Chrome only) |
 | Channel roster size | 12 |
