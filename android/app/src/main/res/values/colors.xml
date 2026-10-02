@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<!-- The same teal and amber as the Chrome extension, so the two feel like one tool. -->
+	<color name="accent">#0E7C7B</color>
+	<color name="pin">#B7791F</color>
+	<color name="error">#B42318</color>
+	<color name="icon_background">#0E7C7B</color>
+	<color name="icon_line">#7FC4C3</color>
+	<color name="icon_highlight">#FFC857</color>
+</resources>

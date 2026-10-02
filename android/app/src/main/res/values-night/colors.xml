@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<color name="accent">#3FB8B4</color>
+	<color name="pin">#E3A948</color>
+	<color name="error">#FF8A80</color>
+</resources>
