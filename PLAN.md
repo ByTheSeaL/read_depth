@@ -493,14 +493,21 @@ stored as GitHub repository secrets:
 
 0. **Prompt and format.**
    - Write `shared/system-prompt.md` and the response-format spec.
-   - Add `scripts/try_prompt.py`, which runs sample lookups through
-     `z-ai/glm-5.3-flash` and optionally other models for comparison. The
-     samples cover medical, code, philosophy and a whole sentence, including
-     a same-channel sequence and a come-back-tomorrow case.
+   - Add `scripts/try_prompt.mjs`, which runs sample lookups through
+     `z-ai/glm-5.3-flash` and optionally other models for comparison. It
+     reuses the extension's own prompt-building code. The samples cover
+     medical, code, philosophy and a whole sentence, including a
+     same-channel sequence and a come-back-tomorrow case.
    - Tune the prompt until the `CHANNEL:` line and the first-sentence gist
      are reliable.
-   - The script runs on your machine or the VPS. This build container can't
-     reach openrouter.ai.
+   - **Result (first run):**
+     - all 8 lookups went to the expected channel, including returning to
+       Python a day later;
+     - answers referred back to earlier lookups;
+     - answers were 64–100 words against an 80-word target;
+     - each lookup cost about $0.0001;
+     - text usually started appearing in 1–3 s, with outliers of 8 s and
+       20 s from the provider.
 1. **Chrome extension + CI.**
    - The `build.yml` workflow, the `VERSION` file and the signing script go
      in first. Every later change then produces a numbered build.
