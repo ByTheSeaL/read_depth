@@ -376,8 +376,21 @@ android/app/src/main/java/com/readdepth/
 - **If the list can't be fetched** (offline), the field falls back to plain
   text.
 
-The API key is stored in `chrome.storage.sync` (convenient, and tied to your
-Google account) and in Android `SharedPreferences` (private to the app).
+### OpenRouter API key
+
+- **The field:** the first field in settings, masked, with a show/hide
+  toggle.
+- **Test key button:** calls OpenRouter's `GET /api/v1/key` and shows either
+  "Key OK", with your remaining credit if OpenRouter reports it, or the
+  error.
+- **First run:** with no key saved, any lookup or search opens a "Add your
+  OpenRouter key" prompt with a link to the settings screen. It does not
+  fail silently.
+- **Storage:**
+  - **Extension:** `chrome.storage.sync`, so one entry covers every Chrome
+    where you're signed in. It is tied to your Google account.
+  - **Android:** `SharedPreferences`, private to the app.
+- **Sent only to `openrouter.ai`**, as the `Authorization: Bearer` header.
 
 ---
 
