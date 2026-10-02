@@ -86,6 +86,16 @@ class CoreTest {
 	}
 
 	@Test
+	fun relativeDayFallsBackToDate() {
+		val day = 24L * 60 * 60 * 1000
+		val now = 1759420800000
+
+		assertEquals("today", Core.relativeDay(now - 1000, now, utc))
+		assertEquals("yesterday", Core.relativeDay(now - day, now, utc))
+		assertEquals("2025-09-02", Core.relativeDay(now - 30 * day, now, utc))
+	}
+
+	@Test
 	fun reasoningAllowance() {
 		assertEquals(1400, Core.maxTokensFor(Settings(targetWords = 80, reasoningEffort = "low")))
 		assertEquals(400, Core.maxTokensFor(Settings(targetWords = 80, reasoningEffort = "off")))

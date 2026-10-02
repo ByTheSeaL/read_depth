@@ -1,7 +1,6 @@
 package com.readdepth
 
 import java.time.Instant
-import java.time.LocalDate
 import java.time.ZoneId
 import java.time.temporal.ChronoUnit
 import kotlin.math.max
@@ -104,7 +103,7 @@ object Core {
 			days <= 0 -> "today"
 			days == 1L -> "yesterday"
 			days < 14 -> "$days days ago"
-			else -> LocalDate.ofInstant(Instant.ofEpochMilli(ts), ZoneId.of("UTC")).toString()
+			else -> Instant.ofEpochMilli(ts).atZone(ZoneId.of("UTC")).toLocalDate().toString()   // LocalDate.ofInstant needs API 34
 		}
 	}
 
