@@ -56,6 +56,62 @@ third-party apps anyway; that route needs a separate paid API key.
 
 ---
 
+## 1a. The lookup screen
+
+The same layout everywhere a lookup is shown: the Chrome overlay, the
+extension popup, the Android dialog and the Android main screen.
+
+```
+┌──────────────────────────────────────────────┐
+│ [ functools.wraps                       ] ⟳  │  ← query box: your selection, editable
+│ Channel: [ Python               ] 📌 auto    │
+├──────────────────────────────────────────────┤
+│ `functools.wraps` is a decorator you put on  │
+│ the inner function of your own decorator so… │  ← streamed explanation
+│                                              │
+│ ▸ You: why does the name matter?             │
+│   Tools like debuggers and help() read…      │  ← follow-up thread
+├──────────────────────────────────────────────┤
+│ [ Ask a follow-up…                      ] ➤  │
+│ Copy                                         │
+└──────────────────────────────────────────────┘
+```
+
+### Query box: rewording the lookup
+
+- **What's in it:** the highlighted word(s) sit at the top in an editable box.
+  On the main screens it is the search box itself, so the same thing is in
+  the same place in both cases.
+- **Refining:** if the explanation misses what you needed, edit the box and
+  press ⟳ or Enter to re-explain. Add words like *"in statistics"* or
+  *"simpler"*, or widen the selection to the whole phrase.
+- **What happens to the old answer:** the new answer replaces it, in the same
+  channel. Only the final version is kept in history, so a misfire doesn't
+  clutter the channel.
+- **Re-explaining vs following up:** re-explaining asks the original
+  question again, worded better. A follow-up keeps the answer and asks
+  something further.
+
+### Follow-ups: a small chat scoped to one lookup
+
+- **Not a general chatbot.** Each lookup has its own short thread:
+  - an **Ask a follow-up** box under the answer;
+  - each question and answer appended under the original explanation;
+  - answers streamed, like the main one.
+- **What the model receives:** the whole thread so far, as a normal chat
+  (system prompt, original question, explanation, follow-ups), plus the
+  channel history the original lookup had. That keeps the conversation
+  anchored to the term and the document.
+- **Answer length:** follow-ups use the same length setting.
+- **Where it's saved:** the thread is stored with the lookup. Reopening the
+  lookup from history shows the whole thread, and you can carry on asking.
+- **Effect on the channel:** only the original lookup's term and gist enter
+  the channel roster. The full thread is sent only while you're in that
+  lookup. This keeps the roster small. If a follow-up turns out to matter,
+  you can look that term up directly and it becomes its own entry.
+
+---
+
 ## 2. Channels: continuity between lookups
 
 A **channel** is an area of knowledge that lookups belong to, for example
@@ -179,8 +235,9 @@ What the default prompt asks for:
 
 - **Audience:** someone in the middle of reading who wants to keep going.
   Plain language, no padding, no "Great question".
-- **Length:** about 40–120 words. Longer only for a full sentence that needs
-  unpacking.
+- **Length:** aim for about **{{target_words}}** words, from the *Answer
+  length* setting (default 80). Go shorter when a term is simple. Allow up to
+  roughly 1.5× when a whole sentence needs unpacking.
 - **Shape:**
   1. One-sentence definition, written to stand alone as the gist.
   2. What it means *here*, using the surrounding context when given.
@@ -192,9 +249,16 @@ What the default prompt asks for:
 - **Format:** `CHANNEL:` first line, then the explanation in light Markdown
   (bold, inline code, short lists only).
 
-Variables filled in per request: the channel roster or pinned channel
-history, the source title and URL, the surrounding context and the
-selection.
+Variables filled in per request:
+
+- `{{target_words}}`;
+- the channel roster, or the pinned channel's history;
+- the source title and URL;
+- the surrounding context;
+- the selection.
+
+`max_tokens` is set to about 3× the target word count, so a runaway answer
+gets cut off.
 
 ---
 
@@ -240,15 +304,13 @@ chrome-extension/
   - the selected text;
   - the channel box (with auto/pinned state);
   - the streamed explanation;
-  - **Copy** and **Ask a follow-up** buttons. A follow-up continues the same
-    conversation and is stored under the same lookup.
+  - **Copy** and **Ask a follow-up**. The layout is described in §1a.
   - It closes with **Esc** or a click outside.
 - **Pages where content scripts can't run** (`chrome://` pages, the Web
   Store, Chrome's built-in PDF viewer): the context menu still provides the
   selected text. The answer opens in a small extension popup window instead
   of an overlay.
-- **Model picker:** filled from OpenRouter's public `GET /api/v1/models`
-  list, searchable, with a free-text fallback.
+- **Model picker:** see §7.
 
 ## 6. Android app
 
@@ -291,11 +353,28 @@ android/app/src/main/java/com/readdepth/
 | Setting | Default |
 |---------|---------|
 | OpenRouter API key | — (required) |
-| Model | a fast, inexpensive model; chosen during phase 0 testing |
+| Model | `z-ai/glm-5.3-flash` |
+| Answer length | 80 words (target; adjustable 20–300) |
 | System prompt | the shared default, with a reset button |
 | Send surrounding context | on (Chrome only) |
 | Channel roster size | 12 |
 | History kept | 1,000 lookups |
+
+### Model dropdown
+
+- **Where the list comes from:** OpenRouter's public `GET /api/v1/models`,
+  which needs no key. The list is fetched when the settings screen opens and
+  cached for a day.
+- **Extension:** a searchable dropdown.
+- **Android:** a dropdown with a filter box, i.e. an `AutoCompleteTextView`.
+- **Each entry shows** the model's name and its price per million input and
+  output tokens, so cheap and fast choices are easy to spot.
+- **Recently used** models are pinned to the top.
+- **Model IDs not in the list:** you can still type any ID by hand. If the ID
+  isn't in the fetched list, settings shows a warning, which catches typos and
+  retired models.
+- **If the list can't be fetched** (offline), the field falls back to plain
+  text.
 
 The API key is stored in `chrome.storage.sync` (convenient, and tied to your
 Google account) and in Android `SharedPreferences` (private to the app).
@@ -306,11 +385,14 @@ Google account) and in Android `SharedPreferences` (private to the app).
 
 0. **Prompt and format.**
    - Write `shared/system-prompt.md` and the response-format spec.
-   - Add a small script that runs a set of sample lookups through two or
-     three OpenRouter models. The samples cover medical, code, philosophy
-     and a whole sentence, including a same-channel sequence and a
-     come-back-tomorrow case.
-   - Pick the default model on quality, speed and price.
+   - Add `scripts/try_prompt.py`, which runs sample lookups through
+     `z-ai/glm-5.3-flash` and optionally other models for comparison. The
+     samples cover medical, code, philosophy and a whole sentence, including
+     a same-channel sequence and a come-back-tomorrow case.
+   - Tune the prompt until the `CHANNEL:` line and the first-sentence gist
+     are reliable.
+   - The script runs on your machine or the VPS. This build container can't
+     reach openrouter.ai.
 1. **Chrome extension.**
    - Context menu, overlay, streaming, popup search, options.
    - Channels: auto, pinned, and correcting a misfile.
@@ -318,16 +400,18 @@ Google account) and in Android `SharedPreferences` (private to the app).
    - Share and select-text entry points, dialog, main screen search,
      settings, channels.
    - First APK on GitHub Releases.
+   - Both clients ship with the editable query box and follow-ups from the
+     start.
 3. **Polish.**
    - Channel manager (rename, merge, delete).
-   - Follow-up questions.
-   - History browsing.
+   - History browsing, including reopening a lookup's thread.
    - Error states: no key, no credit, rate-limited, offline.
 
-## 9. Open questions
+## 9. Decisions so far
 
-- **Default model:** to be decided from the phase 0 comparison.
-- **Explanation length:** is 40–120 words right, or would you like a
-  "Shorter / Longer" toggle?
-- **Follow-ups:** should a follow-up count as part of the channel history,
-  or only the original lookup?
+- **Default model:** `z-ai/glm-5.3-flash`. Changeable from the dropdown.
+- **Answer length:** a setting, default 80 words.
+- **Follow-ups:** a per-lookup thread. Only the original lookup feeds the
+  channel roster.
+- **Query box:** the selection sits at the top of every lookup screen and can
+  be edited to re-explain.
